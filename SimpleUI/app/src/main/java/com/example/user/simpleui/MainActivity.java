@@ -5,12 +5,16 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -18,8 +22,10 @@ public class MainActivity extends AppCompatActivity {
     EditText editText;
     RadioGroup radioGroup;
     CheckBox checkBox;
+    ListView listView;
 
-//    String selectedSex = "Male";
+    ArrayList<String> drinks = new ArrayList<>();
+    //    String selectedSex = "Male";
 //    String name = "";
 //    String sex = "";
     String drinkName = "black tea";
@@ -28,16 +34,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        textView = (TextView)findViewById(R.id.textView);
-        editText = (EditText)findViewById(R.id.editText);
-        radioGroup = (RadioGroup)findViewById(R.id.radioGroup);
-        checkBox = (CheckBox)findViewById(R.id.checkBox);
+        textView = (TextView) findViewById(R.id.textView);
+        editText = (EditText) findViewById(R.id.editText);
+        radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
+        checkBox = (CheckBox) findViewById(R.id.checkBox);
+        listView = (ListView) findViewById(R.id.listView);
+
+        setupListView();
 
         editText.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if(keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)
-                {
+                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
                     click(v);
                     return true;
                 }
@@ -53,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
 //                } else if (checkedId == R.id.femaleRadioButton) {
 //                    selectedSex = "Female";
 //                }
-                RadioButton radioButton = (RadioButton)findViewById(checkedId);
+                RadioButton radioButton = (RadioButton) findViewById(checkedId);
                 drinkName = radioButton.getText().toString();
             }
         });
@@ -66,6 +74,13 @@ public class MainActivity extends AppCompatActivity {
 //        });
     }
 
+    void setupListView()
+    {
+        String[] data = new String[]{"123","456","789","Hello", "ListView","Hi"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, drinks);
+        listView.setAdapter(adapter);
+    }
+
     public void click(View view)
     {
         String note = editText.getText().toString();
@@ -73,9 +88,13 @@ public class MainActivity extends AppCompatActivity {
 //        sex = selectedSex;
 
 //        changeTextView();
+        drinks.add(drinkName);
+
         textView.setText(drinkName);
 
         editText.setText("");
+
+        setupListView();
     }
 
 //    public void changeTextView()
