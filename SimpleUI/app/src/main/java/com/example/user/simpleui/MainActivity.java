@@ -126,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
         Order order = new Order();
         order.note = note;
         order.drinkName = drinkName;
+        order.storeInfo = (String)storeSpinner.getSelectedItem();
         orders.add(order);
 
         textView.setText(drinkName);
