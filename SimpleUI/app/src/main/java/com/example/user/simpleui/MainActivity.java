@@ -13,6 +13,7 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SimpleAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     RadioGroup radioGroup;
     CheckBox checkBox;
     ListView listView;
+    Spinner storeSpinner;
 
     ArrayList<Order> orders = new ArrayList<>();
     //    String selectedSex = "Male";
@@ -43,8 +45,10 @@ public class MainActivity extends AppCompatActivity {
         radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
         checkBox = (CheckBox) findViewById(R.id.checkBox);
         listView = (ListView) findViewById(R.id.listView);
+        storeSpinner = (Spinner) findViewById(R.id.spinner);
 
         setupListView();
+        setupSpinner();
 
         editText.setOnKeyListener(new View.OnKeyListener() {
             @Override
@@ -102,6 +106,13 @@ public class MainActivity extends AppCompatActivity {
 
         OrderAdapter adapter = new OrderAdapter(this, orders);
         listView.setAdapter(adapter);
+    }
+
+    void setupSpinner()
+    {
+        String[] data = getResources().getStringArray(R.array.storeInfo);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, data);
+        storeSpinner.setAdapter(adapter);
     }
 
     public void click(View view)
