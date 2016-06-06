@@ -82,24 +82,25 @@ public class MainActivity extends AppCompatActivity {
     {
 //        String[] data = new String[]{"123","456","789","Hello", "ListView","Hi"};
 //        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, drinks);
-        List<Map<String,String>> data = new ArrayList<>();
+//        List<Map<String,String>> data = new ArrayList<>();
+//
+//        for(int i = 0; i < orders.size(); i++)
+//        {
+//            Order order = orders.get(i);
+//            Map<String,String> item = new HashMap<>();
+//
+//            item.put("note", order.note);
+//            item.put("drinkName", order.drinkName);
+//
+//            data.add(item);
+//        }
+//
+//        String[] from = {"note", "drinkName"};
+//        int[] to = {R.id.noteTextView, R.id.drinkNameTextView};
+//
+//        SimpleAdapter adapter = new SimpleAdapter(this, data, R.layout.listview_order_item, from, to);
 
-        for(int i = 0; i < orders.size(); i++)
-        {
-            Order order = orders.get(i);
-            Map<String,String> item = new HashMap<>();
-
-            item.put("note", order.note);
-            item.put("drinkName", order.drinkName);
-
-            data.add(item);
-        }
-
-        String[] from = {"note", "drinkName"};
-        int[] to = {R.id.noteTextView, R.id.drinkNameTextView};
-
-        SimpleAdapter adapter = new SimpleAdapter(this, data, R.layout.listview_order_item, from, to);
-
+        OrderAdapter adapter = new OrderAdapter(this, orders);
         listView.setAdapter(adapter);
     }
 
