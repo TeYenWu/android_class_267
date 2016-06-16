@@ -1,5 +1,8 @@
 package com.example.user.simpleui;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,7 +17,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class DrinkMenuActivity extends AppCompatActivity {
+public class DrinkMenuActivity extends AppCompatActivity implements DrinkOrderDialog.OnFragmentInteractionListener {
 
     ListView drinkListView;
     TextView priceTextView;
@@ -45,12 +48,22 @@ public class DrinkMenuActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     DrinkAdapter drinkAdapter = (DrinkAdapter)parent.getAdapter();
                     Drink drink = (Drink)drinkAdapter.getItem(position);
-                    drinkOrders.add(drink);
-                    updateTotalPrice();
+                    showDrinkOderDialog(drink);
                 }
         });
 
         Log.d("Debug", "Drink Menu Acitivity OnCreate");
+    }
+    private void showDrinkOderDialog(Drink drink) {
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+
+        DrinkOrder drinkOrder = new DrinkOrder();
+        drinkOrder.mPrice = drink.mPrice;
+        drinkOrder.lPrice = drink.lPrice;
+        drinkOrder.drinkName = drink.name;
+        DrinkOrderDialog orderDialog = DrinkOrderDialog.newInstance(drinkOrder);
+        orderDialog.show(ft, "DrinkOrderDialog");
     }
 
     private void updateTotalPrice()
