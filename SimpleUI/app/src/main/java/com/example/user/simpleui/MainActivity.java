@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
     ArrayList<Order> orders = new ArrayList<>();
     String drinkName = "black tea";
+    String menuResults = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,12 +87,12 @@ public class MainActivity extends AppCompatActivity {
         String note = editText.getText().toString();
         Order order = new Order();
         order.note = note;
-        order.drinkName = drinkName;
+        order.menuResults = menuResults;
         order.storeInfo = (String)storeSpinner.getSelectedItem();
         orders.add(order);
 
-        textView.setText(drinkName);
-
+        textView.setText(note);
+        menuResults = "";
         editText.setText("");
 
         setupListView();
@@ -112,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         {
             if(resultCode == RESULT_OK)
             {
-                textView.setText(data.getStringExtra("results"));
+                menuResults = data.getStringExtra("results");
                 Toast.makeText(this, "完成菜單", Toast.LENGTH_LONG).show();
             }
         }

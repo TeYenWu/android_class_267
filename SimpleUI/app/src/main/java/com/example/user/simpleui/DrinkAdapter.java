@@ -8,11 +8,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.Inflater;
 
 /**
  * Created by user on 2016/6/13.
@@ -50,7 +47,7 @@ public class DrinkAdapter extends BaseAdapter {
         {
             convertView = inflater.inflate(R.layout.listview_drink_item, null);
             holder = new Holder();
-            holder.drinkNameTextView = (TextView)convertView.findViewById(R.id.drinkNameTextView);
+            holder.drinkNameTextView = (TextView)convertView.findViewById(R.id.noteTextView);
             holder.mPriceTextView = (TextView)convertView.findViewById(R.id.mPriceTextView);
             holder.lPriceTextView = (TextView)convertView.findViewById(R.id.lPriceTextView);
             holder.drinkImageView = (ImageView)convertView.findViewById(R.id.drinkImageView);

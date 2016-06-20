@@ -7,7 +7,9 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -48,12 +50,12 @@ public class OrderAdapter extends BaseAdapter {
         if (convertView == null)
         {
             convertView = inflater.inflate(R.layout.listview_order_item, null);
-            TextView drinkNameTextView = (TextView)convertView.findViewById(R.id.drinkNameTextView);
+            TextView drinkNumberTextView = (TextView)convertView.findViewById(R.id.drinkNumberTextView);
             TextView noteTextView = (TextView)convertView.findViewById(R.id.noteTextView);
             holder = new Holder();
-            holder.drinkName = drinkNameTextView;
+            holder.drinkNumber = drinkNumberTextView;
             holder.note = noteTextView;
-            holder.store = (TextView)convertView.findViewById(R.id.storeTextView);
+            holder.store = (TextView)convertView.findViewById(R.id.storeInfoTextView);
 
             convertView.setTag(holder);
         }
@@ -65,7 +67,18 @@ public class OrderAdapter extends BaseAdapter {
 
         Order order = orders.get(position);
 
-        holder.drinkName.setText(order.drinkName);
+        int totalNumber = 0;
+        try {
+            JSONArray jsonArray = new JSONArray(order.menuResults);
+            for(int i = 0; i < jsonArray.length(); i++){
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                totalNumber += jsonObject.getInt("lNumber")+jsonObject.getInt("mNumber");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        holder.drinkNumber.setText(String.valueOf(totalNumber));
         holder.note.setText(order.note);
         holder.store.setText(order.storeInfo);
 
@@ -73,7 +86,7 @@ public class OrderAdapter extends BaseAdapter {
     }
 
     class Holder{
-        TextView drinkName;
+        TextView drinkNumber;
         TextView note;
         TextView store;
     }

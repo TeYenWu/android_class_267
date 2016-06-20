@@ -46,7 +46,7 @@ public class DrinkMenuActivity extends AppCompatActivity implements DrinkOrderDi
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     DrinkAdapter drinkAdapter = (DrinkAdapter)parent.getAdapter();
-                    Drink drink = (Drink)drinkAdapter.getItem(position);
+                    Drink   drink = (Drink)drinkAdapter.getItem(position);
                     showDrinkOderDialog(drink);
                 }
         });
