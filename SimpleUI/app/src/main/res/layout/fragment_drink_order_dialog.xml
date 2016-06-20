@@ -9,7 +9,7 @@
     <NumberPicker
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/numberPicker"
+        android:id="@+id/MNumberPicker"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -34,15 +34,15 @@
         android:text="L"
         android:id="@+id/textView6"
         android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/numberPicker"
-        android:layout_toEndOf="@+id/numberPicker"
+        android:layout_toRightOf="@+id/MNumberPicker"
+        android:layout_toEndOf="@+id/MNumberPicker"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="80dp" />
 
     <NumberPicker
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/numberPicker2"
+        android:id="@+id/LNumberPicker"
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/textView6"
         android:layout_toEndOf="@+id/textView6"
@@ -54,7 +54,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="冰塊"
         android:id="@+id/textView7"
-        android:layout_below="@+id/numberPicker"
+        android:layout_below="@+id/MNumberPicker"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
@@ -65,7 +65,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:orientation="horizontal"
-        android:id="@+id/radioGroup2">
+        android:id="@+id/iceRadioGroup">
 
         <RadioButton
             android:layout_width="wrap_content"
@@ -96,7 +96,7 @@
         android:layout_below="@+id/textView8"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:id="@+id/radioGroup3">
+        android:id="@+id/sugarRadioGroup">
 
         <RadioButton
             android:layout_width="wrap_content"
@@ -127,7 +127,7 @@
         android:text="糖度"
         android:id="@+id/textView8"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/radioGroup2"
+        android:layout_below="@+id/iceRadioGroup"
         android:layout_alignParentLeft="true" />
 
     <TextView
@@ -136,14 +136,14 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="備註"
         android:id="@+id/textView9"
-        android:layout_below="@+id/radioGroup3"
+        android:layout_below="@+id/sugarRadioGroup"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/editText2"
+        android:id="@+id/noteEditText"
         android:layout_below="@+id/textView9"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
