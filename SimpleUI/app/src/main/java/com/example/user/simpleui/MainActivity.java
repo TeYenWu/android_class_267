@@ -22,6 +22,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     ListView listView;
     Spinner storeSpinner;
 
-    ArrayList<Order> orders = new ArrayList<>();
+    List<Order> orders = new ArrayList<>();
     String drinkName = "black tea";
     String menuResults = "";
 
@@ -48,6 +53,24 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        ParseObject testObject = new ParseObject("TestObject");
+        testObject.put("foo", "bar");
+        testObject.saveInBackground();
+
+        ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("TestObject");
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if(e == null)
+                {
+                    for (ParseObject object : objects)
+                    {
+                        Toast.makeText(MainActivity.this, object.getString("foo"), Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        });
 
         setContentView(R.layout.activity_main);
         textView = (TextView) findViewById(R.id.textView);
@@ -112,16 +135,23 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupOrdersData()
     {
-        String content = Utils.readFile(this, "history");
-        String[] datas = content.split("\n");
-        for(int i = 0 ; i < datas.length ; i++)
-        {
-            Order order = Order.newInstanceWithData(datas[i]);
-            if(order != null)
-            {
-                orders.add(order);
+//        String content = Utils.readFile(this, "history");
+//        String[] datas = content.split("\n");
+//        for(int i = 0 ; i < datas.length ; i++)
+//        {
+//            Order order = Order.newInstanceWithData(datas[i]);
+//            if(order != null)
+//            {
+//                orders.add(order);
+//            }
+//        }
+        Order.getQuery().findInBackground(new FindCallback<Order>() {
+            @Override
+            public void done(List<Order> objects, ParseException e) {
+                orders = objects;
+                setupListView();
             }
-        }
+        });
     }
 
     void setupSpinner()
@@ -135,9 +165,10 @@ public class MainActivity extends AppCompatActivity {
     {
         String note = editText.getText().toString();
         Order order = new Order();
-        order.note = note;
-        order.menuResults = menuResults;
-        order.storeInfo = (String)storeSpinner.getSelectedItem();
+        order.setNote(note);
+        order.setMenuResults(menuResults);
+        order.setStoreInfo((String) storeSpinner.getSelectedItem());
+        order.saveEventually();
         orders.add(order);
 
         Utils.writeFile(this, "history", order.getJsonObject().toString());
