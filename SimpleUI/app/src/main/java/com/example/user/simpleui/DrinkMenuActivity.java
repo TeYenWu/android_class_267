@@ -11,8 +11,12 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.parse.DeleteCallback;
 import com.parse.FindCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.SaveCallback;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -98,12 +102,31 @@ public class DrinkMenuActivity extends AppCompatActivity implements DrinkOrderDi
     {
         Drink.getQuery().findInBackground(new FindCallback<Drink>() {
             @Override
-            public void done(List<Drink> objects, ParseException e) {
-                if(e == null)
-                {
-                    drinks = objects;
-                    setupListView();
-                }
+            public void done(final List<Drink> objects, ParseException e) {
+            if(e != null)
+            {
+                Drink.getQuery().fromLocalDatastore().findInBackground(new FindCallback<Drink>() {
+                    @Override
+                    public void done(List<Drink> objects, ParseException e) {
+                        drinks = objects;
+                        setupListView();
+                    }
+                });
+            }
+            else{
+                ParseObject.unpinAllInBackground("Drink", new DeleteCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        ParseObject.pinAllInBackground(objects, new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                drinks = objects;
+                                setupListView();
+                            }
+                        });
+                    }
+                });
+            }
             }
         });
 //        for(int i = 0; i < 4; i++)
