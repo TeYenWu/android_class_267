@@ -114,16 +114,20 @@ public class DrinkMenuActivity extends AppCompatActivity implements DrinkOrderDi
                 });
             }
             else{
-                ParseObject.unpinAllInBackground("Drink", new DeleteCallback() {
+                ParseObject.unpinAllInBackground("Drink" ,new DeleteCallback() {
                     @Override
                     public void done(ParseException e) {
                         ParseObject.pinAllInBackground(objects, new SaveCallback() {
                             @Override
                             public void done(ParseException e) {
+                                if (e != null) {
+                                    Log.d("debug", e.getMessage().toString());
+                                }
                                 drinks = objects;
                                 setupListView();
                             }
                         });
+//
                     }
                 });
             }
