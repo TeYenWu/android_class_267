@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -13,11 +14,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.lang.ref.WeakReference;
+
 public class OrderDetailActivity extends AppCompatActivity {
 
     TextView noteTextView;
     TextView menuResultsTextView;
     TextView storeInfoTextView;
+    ImageView staticMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +36,7 @@ public class OrderDetailActivity extends AppCompatActivity {
         noteTextView = (TextView) findViewById(R.id.noteTextView);
         storeInfoTextView = (TextView) findViewById(R.id.storeInfoTextView);
         menuResultsTextView = (TextView) findViewById(R.id.menuResultsTextView);
+        staticMap = (ImageView)findViewById(R.id.imageView);
 
         if (note != null)
             noteTextView.setText(note);
@@ -59,11 +64,13 @@ public class OrderDetailActivity extends AppCompatActivity {
         if(storeInfos != null && storeInfos.length > 1)
         {
             String address = storeInfos[1];
-            (new GeoCodingTask()).execute(address);
+            (new GeoCodingTask(staticMap)).execute(address);
         }
     }
 
     private static class GeoCodingTask extends AsyncTask<String, Void, Bitmap>{
+
+        WeakReference<ImageView> imageViewWeakReference;
 
         @Override
         protected Bitmap doInBackground(String... params) {
@@ -73,12 +80,21 @@ public class OrderDetailActivity extends AppCompatActivity {
                 Log.d("Debug", String.valueOf(latlng[0]));
                 Log.d("Debug", String.valueOf(latlng[1]));
             }
-            return null;
+            return Utils.getStaticMap(latlng);
         }
 
         @Override
         protected void onPostExecute(Bitmap bitmap) {
             super.onPostExecute(bitmap);
+            if(imageViewWeakReference.get() != null)
+            {
+                ImageView imageView = imageViewWeakReference.get();
+                imageView.setImageBitmap(bitmap);
+            }
+        }
+
+        public GeoCodingTask(ImageView imageView){
+            this.imageViewWeakReference = new WeakReference<ImageView>(imageView);
         }
     }
 }
