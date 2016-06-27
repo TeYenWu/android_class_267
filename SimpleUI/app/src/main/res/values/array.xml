@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="storeInfo">
-        <item>台大店</item>
-        <item>永大店</item>
-        <item>輔大店</item>
-        <item>公館店</item>
-        <item>西門店</item>
+        <item>台大店,台北市大安區羅斯福路四段一號</item>
+        <item>師大店,台北市大安區師大路98號</item>
+        <item>輔大店,新北市新莊區建國一路28號</item>
+        <item>公館店,台北市中正區汀洲路三段195號</item>
+        <item>西門店,台北市萬華區成都路37號</item>
     </string-array>
 
 
