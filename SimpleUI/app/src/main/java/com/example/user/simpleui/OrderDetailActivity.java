@@ -9,6 +9,13 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,12 +23,15 @@ import org.w3c.dom.Text;
 
 import java.lang.ref.WeakReference;
 
-public class OrderDetailActivity extends AppCompatActivity {
+public class OrderDetailActivity extends AppCompatActivity implements GeoCodingTask.GeoCodinTaskResponse {
 
     TextView noteTextView;
     TextView menuResultsTextView;
     TextView storeInfoTextView;
     ImageView staticMap;
+
+    MapFragment mapFragment;
+    GoogleMap googleMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +47,7 @@ public class OrderDetailActivity extends AppCompatActivity {
         storeInfoTextView = (TextView) findViewById(R.id.storeInfoTextView);
         menuResultsTextView = (TextView) findViewById(R.id.menuResultsTextView);
         staticMap = (ImageView)findViewById(R.id.imageView);
+        mapFragment = (MapFragment)getFragmentManager().findFragmentById(R.id.fragment);
 
         if (note != null)
             noteTextView.setText(note);
@@ -64,7 +75,23 @@ public class OrderDetailActivity extends AppCompatActivity {
         if(storeInfos != null && storeInfos.length > 1)
         {
             String address = storeInfos[1];
-            (new GeoCodingTask(staticMap)).execute(address);
+            (new GeoCodingTask(this)).execute(address);
+        }
+
+        mapFragment.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap map) {
+                googleMap = map;
+            }
+        });
+    }
+
+    @Override
+    public void reponseWithGeoCodingResults(LatLng latLng) {
+        if (googleMap != null)
+        {
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17);
+            googleMap.moveCamera(cameraUpdate);
         }
     }
 //
