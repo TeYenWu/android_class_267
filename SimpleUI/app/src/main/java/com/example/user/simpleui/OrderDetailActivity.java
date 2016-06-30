@@ -67,34 +67,34 @@ public class OrderDetailActivity extends AppCompatActivity {
             (new GeoCodingTask(staticMap)).execute(address);
         }
     }
-
-    private static class GeoCodingTask extends AsyncTask<String, Void, Bitmap>{
-
-        WeakReference<ImageView> imageViewWeakReference;
-
-        @Override
-        protected Bitmap doInBackground(String... params) {
-            String address = params[0];
-            double[] latlng = Utils.getLatLngFromGoogleMapAPI(address);
-            if(latlng != null) {
-                Log.d("Debug", String.valueOf(latlng[0]));
-                Log.d("Debug", String.valueOf(latlng[1]));
-            }
-            return Utils.getStaticMap(latlng);
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            super.onPostExecute(bitmap);
-            if(imageViewWeakReference.get() != null)
-            {
-                ImageView imageView = imageViewWeakReference.get();
-                imageView.setImageBitmap(bitmap);
-            }
-        }
-
-        public GeoCodingTask(ImageView imageView){
-            this.imageViewWeakReference = new WeakReference<ImageView>(imageView);
-        }
-    }
+//
+//    private static class GeoCodingTask extends AsyncTask<String, Void, Bitmap>{
+//
+//        WeakReference<ImageView> imageViewWeakReference;
+//
+//        @Override
+//        protected Bitmap doInBackground(String... params) {
+//            String address = params[0];
+//            double[] latlng = Utils.getLatLngFromGoogleMapAPI(address);
+//            if(latlng != null) {
+//                Log.d("Debug", String.valueOf(latlng[0]));
+//                Log.d("Debug", String.valueOf(latlng[1]));
+//            }
+//            return Utils.getStaticMap(latlng);
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Bitmap bitmap) {
+//            super.onPostExecute(bitmap);
+//            if(imageViewWeakReference.get() != null)
+//            {
+//                ImageView imageView = imageViewWeakReference.get();
+//                imageView.setImageBitmap(bitmap);
+//            }
+//        }
+//
+//        public GeoCodingTask(ImageView imageView){
+//            this.imageViewWeakReference = new WeakReference<ImageView>(imageView);
+//        }
+//    }
 }
