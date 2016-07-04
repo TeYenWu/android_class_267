@@ -25,10 +25,23 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.parse.FindCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,6 +51,7 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
 
     static final int REQUEST_CODE_DRINK_MENU_ACTIVITY = 0;
+    static final int REQUEST_CODE_LOGIN_ACTIVITY = 1;
 
     TextView textView;
     EditText editText;
@@ -53,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
 
+    CallbackManager callbackManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,10 +81,8 @@ public class MainActivity extends AppCompatActivity {
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
-                if(e == null)
-                {
-                    for (ParseObject object : objects)
-                    {
+                if (e == null) {
+                    for (ParseObject object : objects) {
                         Toast.makeText(MainActivity.this, object.getString("foo"), Toast.LENGTH_LONG).show();
                     }
                 }
@@ -89,6 +103,14 @@ public class MainActivity extends AppCompatActivity {
         setupOrdersData();
         setupListView();
         setupSpinner();
+//        setupFaceBook();
+
+        if(ParseUser.getCurrentUser() == null)
+        {
+            Intent intent = new Intent();
+            intent.setClass(this, LoginActivity.class);
+            startActivityForResult(intent, REQUEST_CODE_LOGIN_ACTIVITY);
+        }
 
         editText.setText(sharedPreferences.getString("editText", ""));
         editText.setOnKeyListener(new View.OnKeyListener() {
@@ -146,6 +168,59 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("storeInfo", order.getStoreInfo());
 
         startActivity(intent);
+    }
+
+    void setupFaceBook()
+    {
+        callbackManager = CallbackManager.Factory.create();
+
+        final LoginButton loginButton = (LoginButton)findViewById(R.id.loginButton);
+
+        loginButton.setReadPermissions("email", "public_profile");
+
+        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                AccessToken accessToken = AccessToken.getCurrentAccessToken();
+                Log.d("Debug", accessToken.getPermissions().toString());
+
+                GraphRequest request = GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback() {
+                    @Override
+                    public void onCompleted(JSONObject object, GraphResponse response) {
+                        Log.d("Debug", object.toString());
+                        try {
+                            textView.setText(object.getString("name"));
+
+                            if (object.has("email")) {
+
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                Bundle bundle = new Bundle();
+                bundle.putString("fields", "email, id, name");
+                request.setParameters(bundle);
+                request.executeAsync();
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+
+            }
+        });
+
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        if(accessToken != null)
+        {
+
+        }
     }
 
     void setupListView()
@@ -237,8 +312,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == REQUEST_CODE_DRINK_MENU_ACTIVITY)
+        if(requestCode == REQUEST_CODE_DRINK_MENU_ACTIVITY);
         {
             if(resultCode == RESULT_OK)
             {

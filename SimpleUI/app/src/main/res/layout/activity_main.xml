@@ -94,4 +94,12 @@
         android:layout_toEndOf="@+id/button"
         android:onClick="goToMenu" />
 
+    <com.facebook.login.widget.LoginButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/loginButton"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/textView"
+        android:layout_toEndOf="@+id/textView" />
+
 </RelativeLayout>

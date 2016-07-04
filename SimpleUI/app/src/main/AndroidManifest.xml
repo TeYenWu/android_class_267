@@ -6,6 +6,11 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
     <application
         android:name=".SimpleUIApplication"
         android:allowBackup="true"
@@ -15,7 +20,11 @@
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBFZ2xssMoXSPQh90smTM_NMEmA4KxV0ao"/>
+            android:value="AIzaSyBFZ2xssMoXSPQh90smTM_NMEmA4KxV0ao" />
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,7 +33,15 @@
             </intent-filter>
         </activity>
         <activity android:name=".DrinkMenuActivity" />
-        <activity android:name=".OrderDetailActivity"></activity>
+        <activity android:name=".OrderDetailActivity" />
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name=".LoginActivity"
+            android:label="@string/title_activity_login"></activity>
     </application>
 
 </manifest>
