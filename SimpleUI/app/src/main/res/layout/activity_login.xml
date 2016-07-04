@@ -85,7 +85,7 @@
             <com.facebook.login.widget.LoginButton
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/view"
+                android:id="@+id/facebookLoginButton"
                 android:layout_marginTop="16dp" />
 
         </LinearLayout>
