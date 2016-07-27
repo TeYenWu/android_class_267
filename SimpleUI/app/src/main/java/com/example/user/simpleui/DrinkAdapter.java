@@ -67,11 +67,11 @@ public class DrinkAdapter extends BaseAdapter {
 
         Drink drink = drinks.get(position);
 
-        holder.drinkNameTextView.setText(drink.getName());
-        holder.mPriceTextView.setText(String.valueOf(drink.getmPrice()));
-        holder.lPriceTextView.setText(String.valueOf(drink.getlPrice()));
+        holder.drinkNameTextView.setText(drink.name);
+        holder.mPriceTextView.setText(String.valueOf(drink.mPrice));
+        holder.lPriceTextView.setText(String.valueOf(drink.lPrice));
 
-        drink.getImage().getFileInBackground(new GetFileCallback() {
+        drink.getParseFile().getFileInBackground(new GetFileCallback() {
             @Override
             public void done(File file, ParseException e) {
                 Picasso.with(inflater.getContext()).load(file).into(holder.drinkImageView);

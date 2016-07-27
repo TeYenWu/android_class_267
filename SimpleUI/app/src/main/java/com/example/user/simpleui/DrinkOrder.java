@@ -1,57 +1,111 @@
 package com.example.user.simpleui;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.parse.ParseObject;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by wudeyan on 6/16/16.
  */
-public class DrinkOrder {
+public class DrinkOrder implements Parcelable {
 
     String ice = "正常";
     String sugar = "正常";
     String note = "";
-    String drinkName;
+
+    Drink drink;
+
     int lNumber = 0;
     int mNumber = 1;
-    int lPrice;
-    int mPrice;
 
-    public JSONObject getJsonObject()
-    {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("ice", ice);
-            jsonObject.put("sugar", sugar);
-            jsonObject.put("lNumber", lNumber);
-            jsonObject.put("mNumber", mNumber);
-            jsonObject.put("lPrice", lPrice);
-            jsonObject.put("mPrice", mPrice);
-            jsonObject.put("drinkName",drinkName);
-            jsonObject.put("note", note);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return jsonObject;
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
-    public static DrinkOrder newInstanceWithJsonObject(String data)
-    {
-        try {
-            JSONObject jsonObject = new JSONObject(data);
-            DrinkOrder drinkOrder = new DrinkOrder();
-            drinkOrder.ice = jsonObject.getString("ice");
-            drinkOrder.drinkName = jsonObject.getString("drinkName");
-            drinkOrder.sugar = jsonObject.getString("sugar");
-            drinkOrder.note = jsonObject.getString("note");
-            drinkOrder.mPrice = jsonObject.getInt("mPrice");
-            drinkOrder.mNumber = jsonObject.getInt("mNumber");
-            drinkOrder.lPrice = jsonObject.getInt("lPrice");
-            drinkOrder.lNumber = jsonObject.getInt("lNumber");
-            return drinkOrder;
-        } catch (JSONException e) {
-            e.printStackTrace();
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.ice);
+        dest.writeString(this.sugar);
+        dest.writeString(this.note);
+        dest.writeParcelable(this.drink, flags);
+        dest.writeInt(this.lNumber);
+        dest.writeInt(this.mNumber);
+    }
+
+    public DrinkOrder(Drink drink) {
+        this.drink = drink;
+    }
+
+    public DrinkOrder() {
+    }
+
+    protected DrinkOrder(Parcel in) {
+        this.ice = in.readString();
+        this.sugar = in.readString();
+        this.note = in.readString();
+        this.drink = in.readParcelable(Drink.class.getClassLoader());
+        this.lNumber = in.readInt();
+        this.mNumber = in.readInt();
+    }
+
+    public static final Parcelable.Creator<DrinkOrder> CREATOR = new Parcelable.Creator<DrinkOrder>() {
+        @Override
+        public DrinkOrder createFromParcel(Parcel source) {
+            return new DrinkOrder(source);
         }
-        return null;
+
+        @Override
+        public DrinkOrder[] newArray(int size) {
+            return new DrinkOrder[size];
+        }
+    };
+
+    public static List<ParseObject> getParseObjectsFromDrinkOrders(List<DrinkOrder> drinkOrders)
+    {
+        List<ParseObject> parseObjects = new ArrayList<>();
+        for(DrinkOrder drinkOrder : drinkOrders)
+        {
+            ParseObject parseObject = new ParseObject("DrinkOrder");
+            parseObject.put("ice", drinkOrder.ice);
+            parseObject.put("sugar", drinkOrder.sugar);
+            parseObject.put("note", drinkOrder.note);
+            parseObject.put("lNumber", drinkOrder.lNumber);
+            parseObject.put("mNumber", drinkOrder.mNumber);
+            parseObject.put("drink", drinkOrder.drink.getParseObject());
+            parseObjects.add(parseObject);
+        }
+        return parseObjects;
+    }
+
+    public static List<DrinkOrder> getDrinkOrdersFromParseObjects(List<ParseObject> objects)
+    {
+        List<DrinkOrder> drinkOrders = new ArrayList<>();
+        if(objects != null)
+            for(ParseObject object: objects)
+            {
+                if(object.getClassName().equals("DrinkOrder"))
+                {
+                    DrinkOrder order = new DrinkOrder();
+                    order.note = object.getString("note");
+                    order.ice = object.getString("ice");
+                    order.sugar = object.getString("sugar");
+                    order.lNumber = object.getInt("lNumber");
+                    order.mNumber = object.getInt("mNumber");
+
+                    ParseObject o = object.getParseObject("drink");
+                    order.drink = Drink.getDrinkFromParseObject(o);
+
+                    drinkOrders.add(order);
+                }
+            }
+        return  drinkOrders;
     }
 }

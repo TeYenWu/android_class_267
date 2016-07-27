@@ -1,80 +1,136 @@
 package com.example.user.simpleui;
 
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.parse.FindCallback;
 import com.parse.ParseClassName;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.SaveCallback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by user on 2016/6/6.
  */
+public class Order implements Parcelable {
 
-@ParseClassName("Order")
-public class Order extends ParseObject {
+    String note;
+    String storeInfo;
+    List<DrinkOrder> drinkOrders;
 
-    public String getNote(){ return getString("note"); }
-    public void setNote(String note) { put("note", note);}
-
-    public String getMenuResults(){
-        String menuResults = getString("menuResults");
-        if(menuResults == null)
-        {
-            menuResults = "";
-        }
-        return menuResults;
+    @Override
+    public int describeContents() {
+        return 0;
     }
-    public void setMenuResults(String menuResults){ put("menuResults", menuResults);}
 
-    public String getStoreInfo(){ return  getString("storeInfo");}
-    public void setStoreInfo(String storeInfo){ put("storeInfo", storeInfo);}
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.note);
+        dest.writeString(this.storeInfo);
+        dest.writeTypedList(this.drinkOrders);
+    }
 
-    public static ParseQuery<Order> getQuery(){ return  ParseQuery.getQuery(Order.class);}
+    public Order() {
+    }
 
-    public static void getOrdersFromRemote(final FindCallback<Order> callback)
-    {
-        getQuery().findInBackground(new FindCallback<Order>() {
+    protected Order(Parcel in) {
+        this.note = in.readString();
+        this.storeInfo = in.readString();
+        this.drinkOrders = in.createTypedArrayList(DrinkOrder.CREATOR);
+    }
+
+    public static final Parcelable.Creator<Order> CREATOR = new Parcelable.Creator<Order>() {
+        @Override
+        public Order createFromParcel(Parcel source) {
+            return new Order(source);
+        }
+
+        @Override
+        public Order[] newArray(int size) {
+            return new Order[size];
+        }
+    };
+
+
+    public static void getOrdersFromRemote(final OrderFindCallback callback) {
+
+        getParseQuery().findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(List<Order> objects, ParseException e) {
-                if(e == null) {
-                    ParseObject.pinAllInBackground(objects);
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (e == null) {
+                    ParseObject.pinAllInBackground("Order", objects);
+                    List<Order> orders = getOrderListFromParseObjects(objects);
+                    callback.done(orders, e);
                 }
-                callback.done(objects,e);
+                else
+                {
+                    getOrdersFromLocal(callback);
+                }
+
+            }
+        });
+
+    }
+
+    public static void getOrdersFromLocal(final OrderFindCallback callback)
+    {
+        getParseQuery().fromLocalDatastore().findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+
+                List<Order> orders = getOrderListFromParseObjects(objects);
+                callback.done(orders, e);
             }
         });
     }
 
-    public JSONObject getJsonObject()
+    public static List<Order> getOrderListFromParseObjects(List<ParseObject> objects)
     {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("note", getNote());
-            jsonObject.put("menuResults", getMenuResults());
-            jsonObject.put("storeInfo",getStoreInfo());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return jsonObject;
+        List<Order> orders = new ArrayList<>();
+        if(objects != null)
+            for(ParseObject object: objects)
+            {
+                if(object.getClassName().equals("Order"))
+                {
+                    Order order = new Order();
+                    order.note = object.getString("note");
+                    order.storeInfo = object.getString("storeInfo");
+                    List<ParseObject> parseObjects = object.getList("drinkOrders");
+                    order.drinkOrders = DrinkOrder.getDrinkOrdersFromParseObjects(parseObjects);
+                    orders.add(order);
+                }
+            }
+        return  orders;
     }
 
-    public static Order newInstanceWithData(String data) {
-        try {
-            JSONObject jsonObject = new JSONObject(data);
-            Order order = new Order();
-            order.setNote(jsonObject.getString("note"));
-            order.setStoreInfo(jsonObject.getString("storeInfo"));
-            order.setMenuResults(jsonObject.getString("menuResults"));
-            return order;
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public void saveToRemoteAndLocal(SaveCallback callback)
+    {
+        ParseObject parseObject = new ParseObject("Order");
+        parseObject.put("note", note);
+        parseObject.put("storeInfo", storeInfo);
+        parseObject.put("drinkOrders", DrinkOrder.getParseObjectsFromDrinkOrders(drinkOrders));
+        parseObject.pinInBackground();
+        parseObject.saveEventually(callback);
+    }
+
+    public static ParseQuery<ParseObject> getParseQuery()
+    {
+        ParseQuery<ParseObject> parseQuery = new ParseQuery<ParseObject>("Order");
+        parseQuery.include("drinkOrders");
+        parseQuery.include("drinkOrders.drink");
+        return parseQuery;
+    }
+
+    interface OrderFindCallback
+    {
+        void done(List<Order> orders, ParseException e);
     }
 }

@@ -13,13 +13,16 @@ public class OrderDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_order_detail);
 
         Intent intent = getIntent();
-        String note = intent.getStringExtra("note");
-        String menuResults = intent.getStringExtra("menuResults");
-        String storeInfo = intent.getStringExtra("storeInfo");
+        Order order = intent.getParcelableExtra("order");
 
-        Log.d("debug", note);
-        Log.d("debug", menuResults);
-        Log.d("debug", storeInfo);
+        Log.d("debug", order.note);
+        for(DrinkOrder drinkOrder : order.drinkOrders)
+        {
+            Log.d("debug", drinkOrder.note);
+            Log.d("debug", drinkOrder.drink.objectId);
+        }
+
+        Log.d("debug", order.storeInfo);
 
     }
 }

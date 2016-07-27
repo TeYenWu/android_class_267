@@ -29,6 +29,7 @@ import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,8 +48,7 @@ public class MainActivity extends AppCompatActivity {
     Spinner storeSpinner;
 
     List<Order> orders = new ArrayList<>();
-    String drinkName = "black tea";
-    String menuResults = "";
+    List<DrinkOrder> menuResults = new ArrayList<>();
 
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
@@ -141,9 +141,7 @@ public class MainActivity extends AppCompatActivity {
 
         intent.setClass(this,OrderDetailActivity.class);
 
-        intent.putExtra("note", order.getNote());
-        intent.putExtra("menuResults", order.getMenuResults());
-        intent.putExtra("storeInfo", order.getStoreInfo());
+        intent.putExtra("order", order);
 
         startActivity(intent);
     }
@@ -169,34 +167,19 @@ public class MainActivity extends AppCompatActivity {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = cm.getActiveNetworkInfo();
 
-        final FindCallback<Order> callback = new FindCallback<Order>() {
+        final Order.OrderFindCallback callback = new Order.OrderFindCallback() {
             @Override
-            public void done(List<Order> objects, ParseException e) {
-                if(e == null) {
-                    orders = objects;
-                    setupListView();
-                }
+            public void done(List<Order> orderList, ParseException e) {
+                orders = orderList;
+                setupListView();
             }
         };
 
 
         if (info != null && info.isConnected()) {
-            Order.getOrdersFromRemote(new FindCallback<Order>() {
-                @Override
-                public void done(List<Order> objects, ParseException e) {
-                    if(e!=null)
-                    {
-                        Toast.makeText(MainActivity.this, "Sync Failed", Toast.LENGTH_LONG).show();
-                        Order.getQuery().fromLocalDatastore().findInBackground(callback);
-                    }
-                    else
-                    {
-                        callback.done(objects, e);
-                    }
-                }
-            });
+            Order.getOrdersFromRemote(callback);
         } else{
-            Order.getQuery().fromLocalDatastore().findInBackground(callback);
+            Order.getOrdersFromLocal(callback);
         }
     }
 
@@ -211,20 +194,22 @@ public class MainActivity extends AppCompatActivity {
     {
         String note = editText.getText().toString();
         Order order = new Order();
-        order.setNote(note);
-        order.setMenuResults(menuResults);
-        order.setStoreInfo((String) storeSpinner.getSelectedItem());
-        order.pinInBackground();
-        order.saveEventually();
+        order.note = note;
+        order.drinkOrders = menuResults;
+        order.storeInfo = (String) storeSpinner.getSelectedItem();
+        order.saveToRemoteAndLocal(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                setupListView();
+            }
+        });
         orders.add(order);
 
-        Utils.writeFile(this, "history", order.getJsonObject().toString());
-
         textView.setText(note);
-        menuResults = "";
+
         editText.setText("");
 
-        setupListView();
+//        setupListView();
     }
 
     public void goToMenu(View view)
@@ -242,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
         {
             if(resultCode == RESULT_OK)
             {
-                menuResults = data.getStringExtra("results");
+                menuResults = data.getParcelableArrayListExtra("results");
                 Toast.makeText(this, "完成菜單", Toast.LENGTH_LONG).show();
             }
         }

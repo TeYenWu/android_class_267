@@ -1,5 +1,6 @@
 package com.example.user.simpleui;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -55,7 +56,7 @@ public class DrinkOrderDialog extends DialogFragment {
     public static DrinkOrderDialog newInstance(DrinkOrder drinkOrder) {
         DrinkOrderDialog fragment = new DrinkOrderDialog();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, drinkOrder.getJsonObject().toString());;
+        args.putParcelable(ARG_PARAM1, drinkOrder);
         fragment.setArguments(args);
         return fragment;
     }
@@ -80,8 +81,8 @@ public class DrinkOrderDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         if (getArguments() != null) {
-            String data = getArguments().getString(ARG_PARAM1);
-            drinkOrder = DrinkOrder.newInstanceWithJsonObject(data);
+            drinkOrder = getArguments().getParcelable(ARG_PARAM1);
+
         }
 
         LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
@@ -90,7 +91,7 @@ public class DrinkOrderDialog extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         builder.setView(root)
-                .setTitle(drinkOrder.drinkName)
+                .setTitle(drinkOrder.drink.name)
                 .setPositiveButton("確定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -143,6 +144,17 @@ public class DrinkOrderDialog extends DialogFragment {
             mListener = (OnDrinkOrderListener) context;
         } else {
             throw new RuntimeException(context.toString()
+                    + " must implement OnDrinkOrderListener");
+        }
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (activity instanceof OnDrinkOrderListener) {
+            mListener = (OnDrinkOrderListener) activity;
+        } else {
+            throw new RuntimeException(activity.toString()
                     + " must implement OnDrinkOrderListener");
         }
     }

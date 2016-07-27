@@ -69,19 +69,14 @@ public class OrderAdapter extends BaseAdapter {
         Order order = orders.get(position);
 
         int totalNumber = 0;
-        try {
-            JSONArray jsonArray = new JSONArray(order.getMenuResults());
-            for(int i = 0; i < jsonArray.length(); i++){
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                totalNumber += jsonObject.getInt("lNumber")+jsonObject.getInt("mNumber");
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
+        for(DrinkOrder drinkOrder: order.drinkOrders)
+        {
+            totalNumber += drinkOrder.lNumber + drinkOrder.mNumber;
         }
 
         holder.drinkNumber.setText(String.valueOf(totalNumber));
-        holder.note.setText(order.getNote());
-        holder.store.setText(order.getStoreInfo());
+        holder.note.setText(order.note);
+        holder.store.setText(order.storeInfo);
 
         return convertView;
     }

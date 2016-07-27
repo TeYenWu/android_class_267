@@ -63,29 +63,21 @@ public class DrinkMenuActivity extends AppCompatActivity implements DrinkOrderDi
     }
     private void showDrinkOderDialog(Drink drink) {
         FragmentManager fm = getFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
+//        FragmentTransaction ft = fm.beginTransaction();
 
-        DrinkOrder drinkOrder = new DrinkOrder();
-        Boolean flag = false;
+        DrinkOrder drinkOrder = new DrinkOrder(drink);
 
         for (DrinkOrder order : drinkOrders)
         {
-            if(order.drinkName.equals(drink.getName()))
+            if(order.drink.name.equals(drink.name))
             {
                 drinkOrder = order;
-                flag = true;
                 break;
             }
         }
-        if(!flag)
-        {
-            drinkOrder.mPrice = drink.getmPrice();
-            drinkOrder.lPrice = drink.getlPrice();
-            drinkOrder.drinkName = drink.getName();
-        }
 
         DrinkOrderDialog orderDialog = DrinkOrderDialog.newInstance(drinkOrder);
-        orderDialog.show(ft, "DrinkOrderDialog");
+        orderDialog.show(fm, "DrinkOrderDialog");
     }
 
     private void updateTotalPrice()
@@ -93,44 +85,21 @@ public class DrinkMenuActivity extends AppCompatActivity implements DrinkOrderDi
         int total = 0;
         for (DrinkOrder order : drinkOrders)
         {
-            total += order.mPrice * order.mNumber + order.lPrice * order.lNumber;
+            total += order.drink.mPrice * order.mNumber + order.drink.lPrice * order.lNumber;
         }
         priceTextView.setText(String.valueOf(total));
     }
 
     private void setData()
     {
-        Drink.getQuery().findInBackground(new FindCallback<Drink>() {
+        Drink.getDrinksFromRemote(new Drink.FindDrinkCallBack() {
             @Override
-            public void done(final List<Drink> objects, ParseException e) {
-            if(e != null)
-            {
-                Drink.getQuery().fromLocalDatastore().findInBackground(new FindCallback<Drink>() {
-                    @Override
-                    public void done(List<Drink> objects, ParseException e) {
-                        drinks = objects;
-                        setupListView();
-                    }
-                });
-            }
-            else{
-                ParseObject.unpinAllInBackground("Drink" ,new DeleteCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        ParseObject.pinAllInBackground(objects, new SaveCallback() {
-                            @Override
-                            public void done(ParseException e) {
-                                if (e != null) {
-                                    Log.d("debug", e.getMessage().toString());
-                                }
-                                drinks = objects;
-                                setupListView();
-                            }
-                        });
-//
-                    }
-                });
-            }
+            public void done(List<Drink> drinkList, ParseException e) {
+                if (e == null) {
+                    drinks = drinkList;
+                    setupListView();
+                }
+
             }
         });
 //        for(int i = 0; i < 4; i++)
@@ -154,14 +123,7 @@ public class DrinkMenuActivity extends AppCompatActivity implements DrinkOrderDi
     {
         Intent intent = new Intent();
 
-        JSONArray array = new JSONArray();
-        for (DrinkOrder order : drinkOrders)
-        {
-            JSONObject object = order.getJsonObject();
-            array.put(object);
-        }
-
-        intent.putExtra("results", array.toString());
+        intent.putExtra("results", drinkOrders);
 
         setResult(RESULT_OK, intent);
         finish();
@@ -207,7 +169,7 @@ public class DrinkMenuActivity extends AppCompatActivity implements DrinkOrderDi
     public void OnDrinkOrderFinished(DrinkOrder drinkOrder) {
         for(int i = 0; i < drinkOrders.size(); i++)
         {
-            if(drinkOrders.get(i).drinkName.equals(drinkOrder.drinkName))
+            if(drinkOrders.get(i).drink.name.equals(drinkOrder.drink.name))
             {
                 drinkOrders.set(i, drinkOrder);
                 updateTotalPrice();
