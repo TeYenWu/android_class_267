@@ -24,122 +24,73 @@ import java.util.List;
 /**
  * Created by user on 2016/6/13.
  */
-public class Drink implements Parcelable {
+@ParseClassName("Drink")
+public class Drink extends ParseObject implements Parcelable {
 
-    String name;
-    int lPrice;
-    int mPrice;
-    String imageURL;
-    String objectId;
-
-    private ParseFile parseFile;
-    private ParseObject parseObject;
-
-
-    public Drink() {
+    public void setName(String name) {
+        put("name", name);
     }
 
-    public ParseFile getParseFile()
+    public String getName() {
+        return getString("name");
+    }
+
+    public void setmPrice(int mPrice) {
+        put("mPrice", mPrice);
+    }
+
+    public int getmPrice() {
+        return getInt("mPrice");
+    }
+
+    public int getlPrice() {
+        return getInt("lPrice");
+    }
+
+    public void setlPrice(int lPrice) {
+        this.put("lPrice", lPrice);
+    }
+
+    public ParseFile getImage(){ return getParseFile("image");}
+
+    private void setImage(File file)
     {
-        return parseFile;
+        this.put("image", new ParseFile(file));
     }
 
-    public ParseObject getParseObject()
+    public ParseObject getParseObjectWithoutData()
     {
-//        if(parseObject != null)
-//            return parseObject;
-        return ParseObject.createWithoutData("Drink", objectId);
-//        ParseObject parseObject = ParseObjec;
-//        parseObject.put("name", name);
-//        parseObject.put("lPrice", lPrice);
-//        parseObject.put("mPrice", mPrice);
-//        return  parseObject;
+        return ParseObject.createWithoutData(this.getClass(), this.getObjectId());
     }
 
-    public static Drink getDrinkFromParseObject(ParseObject object)
+    public static void syncDrinksFromRemote(final FindCallback<Drink> callback)
     {
-        if(object.getClassName().equals("Drink"))
-        {
-            final Drink drink = new Drink();
-            drink.lPrice = object.getInt("lPrice");
-            drink.mPrice = object.getInt("mPrice");
-            drink.name = object.getString("name");
-            drink.parseFile = object.getParseFile("image");
-            drink.imageURL = drink.parseFile.getUrl();
-            drink.objectId = object.getObjectId();
-//            drink.parseObject = object;
-            return  drink;
-        }
-        return null;
-    }
-
-
-    public static void getDrinksFromRemote(final FindDrinkCallBack callback) {
-
-        getParseQuery().findInBackground(new FindCallback<ParseObject>() {
+        Drink.getQuery().findInBackground(new FindCallback<Drink>() {
             @Override
-            public void done(final List<ParseObject> objects, ParseException e) {
-                if (e == null) {
-                    ParseObject.unpinAllInBackground("Drink", new DeleteCallback() {
+            public void done(final List<Drink> objects, ParseException e) {
+                if(e == null)
+                {
+                    Drink.unpinAllInBackground("Drink", new DeleteCallback() {
                         @Override
                         public void done(ParseException e) {
-                            if(e == null)
+                            if (e == null)
                             {
-                                ParseObject.pinAllInBackground("Drink", objects);
+                                Drink.pinAllInBackground("Drink", objects);
                             }
                         }
                     });
-
-                    List<Drink> drinks = getDrinksListFromParseObjects(objects);
-                    callback.done(drinks, e);
+                    callback.done(objects, e);
                 }
                 else
                 {
-                    getDrinksFromLocal(callback);
+                    Drink.getQuery().fromLocalDatastore().findInBackground(callback);
                 }
-
-            }
-        });
-
-    }
-
-    public static void getDrinksFromLocal(final FindDrinkCallBack callback)
-    {
-        getParseQuery().fromLocalDatastore().findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> objects, ParseException e) {
-
-                List<Drink> drinks = getDrinksListFromParseObjects(objects);
-                callback.done(drinks, e);
             }
         });
     }
 
-    public static List<Drink> getDrinksListFromParseObjects(List<ParseObject> objects)
-    {
-        List<Drink> drinks = new ArrayList<>();
-        if(objects != null)
-            for(ParseObject object: objects)
-            {
-                if(object.getClassName().equals("Drink"))
-                {
-                    Drink drink = getDrinkFromParseObject(object);
-                    drinks.add(drink);
-                }
-            }
-        return  drinks;
-    }
+    public static ParseQuery<Drink> getQuery(){ return  ParseQuery.getQuery(Drink.class);}
 
-    public static ParseQuery<ParseObject> getParseQuery()
-    {
-        ParseQuery<ParseObject> parseQuery = new ParseQuery<ParseObject>("Drink");
-        return parseQuery;
-    }
-
-    interface FindDrinkCallBack
-    {
-        void done(List<Drink> drinks, ParseException e);
-    }
 
     @Override
     public int describeContents() {
@@ -148,25 +99,54 @@ public class Drink implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.name);
-        dest.writeInt(this.lPrice);
-        dest.writeInt(this.mPrice);
-        dest.writeString(imageURL);
-        dest.writeString(objectId);
+
+        dest.writeString(this.getObjectId());
+        dest.writeString(this.getName());
+        dest.writeInt(this.getlPrice());
+        dest.writeInt(this.getmPrice());
+        try {
+            dest.writeSerializable(this.getImage().getFile());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
     }
 
-    protected Drink(Parcel in) {
-        this.name = in.readString();
-        this.lPrice = in.readInt();
-        this.mPrice = in.readInt();
-        this.imageURL = in.readString();
-        this.objectId = in.readString();
+    public static Drink getDrinkFromCache(String objectId)
+    {
+        try {
+            return getQuery().fromLocalDatastore().get(objectId);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Drink()
+    {
+        super();
+    }
+
+    protected Drink(String objectId, Parcel in) {
+        super();
+        this.setObjectId(objectId);
+//        this.set
+        this.setName(in.readString());
+        this.setlPrice(in.readInt());
+        this.setmPrice(in.readInt());
+        File file = (File) in.readSerializable();
+        if(file != null)
+            this.setImage(file);
     }
 
     public static final Creator<Drink> CREATOR = new Creator<Drink>() {
         @Override
         public Drink createFromParcel(Parcel source) {
-            return new Drink(source);
+            String objectId = source.readString();
+            Drink drink = Drink.getDrinkFromCache(objectId);
+            if(drink != null)
+                return drink;
+            return new Drink(objectId, source);
         }
 
         @Override

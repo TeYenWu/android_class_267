@@ -19,7 +19,7 @@ public class OrderDetailActivity extends AppCompatActivity {
         for(DrinkOrder drinkOrder : order.drinkOrders)
         {
             Log.d("debug", drinkOrder.note);
-            Log.d("debug", drinkOrder.drink.objectId);
+            Log.d("debug", drinkOrder.drink.getObjectId());
         }
 
         Log.d("debug", order.storeInfo);

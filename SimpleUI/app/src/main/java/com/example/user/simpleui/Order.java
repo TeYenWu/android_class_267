@@ -26,6 +26,7 @@ public class Order implements Parcelable {
     String storeInfo;
     List<DrinkOrder> drinkOrders;
 
+
     @Override
     public int describeContents() {
         return 0;

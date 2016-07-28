@@ -69,7 +69,7 @@ public class DrinkMenuActivity extends AppCompatActivity implements DrinkOrderDi
 
         for (DrinkOrder order : drinkOrders)
         {
-            if(order.drink.name.equals(drink.name))
+            if(order.drink.getName().equals(drink.getName()))
             {
                 drinkOrder = order;
                 break;
@@ -85,14 +85,14 @@ public class DrinkMenuActivity extends AppCompatActivity implements DrinkOrderDi
         int total = 0;
         for (DrinkOrder order : drinkOrders)
         {
-            total += order.drink.mPrice * order.mNumber + order.drink.lPrice * order.lNumber;
+            total += order.drink.getmPrice() * order.mNumber + order.drink.getlPrice() * order.lNumber;
         }
         priceTextView.setText(String.valueOf(total));
     }
 
     private void setData()
     {
-        Drink.getDrinksFromRemote(new Drink.FindDrinkCallBack() {
+        Drink.syncDrinksFromRemote(new FindCallback<Drink>() {
             @Override
             public void done(List<Drink> drinkList, ParseException e) {
                 if (e == null) {
@@ -169,7 +169,7 @@ public class DrinkMenuActivity extends AppCompatActivity implements DrinkOrderDi
     public void OnDrinkOrderFinished(DrinkOrder drinkOrder) {
         for(int i = 0; i < drinkOrders.size(); i++)
         {
-            if(drinkOrders.get(i).drink.name.equals(drinkOrder.drink.name))
+            if(drinkOrders.get(i).drink.getName().equals(drinkOrder.drink.getName()))
             {
                 drinkOrders.set(i, drinkOrder);
                 updateTotalPrice();

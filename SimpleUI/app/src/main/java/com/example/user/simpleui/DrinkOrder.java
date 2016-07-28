@@ -79,7 +79,7 @@ public class DrinkOrder implements Parcelable {
             parseObject.put("note", drinkOrder.note);
             parseObject.put("lNumber", drinkOrder.lNumber);
             parseObject.put("mNumber", drinkOrder.mNumber);
-            parseObject.put("drink", drinkOrder.drink.getParseObject());
+            parseObject.put("drink", drinkOrder.drink.getParseObjectWithoutData());
             parseObjects.add(parseObject);
         }
         return parseObjects;
@@ -100,8 +100,10 @@ public class DrinkOrder implements Parcelable {
                     order.lNumber = object.getInt("lNumber");
                     order.mNumber = object.getInt("mNumber");
 
-                    ParseObject o = object.getParseObject("drink");
-                    order.drink = Drink.getDrinkFromParseObject(o);
+                    ParseObject o = object.getParseObject("drink") ;
+                    order.drink = (Drink) o;
+//
+
 
                     drinkOrders.add(order);
                 }
